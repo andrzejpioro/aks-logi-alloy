@@ -1,0 +1,16 @@
+environment = "dev"
+
+aks_cluster_name = "loki-aks-dev"
+
+aks_rg_name = "rg-loki-dev"
+
+kubernetes_service_account = "monitoring-sa"
+
+kubernetes_namespace = "monitoring-dev"
+
+service_principal_client_id = "d9141c4e-34d8-4935-92d4-8e082f35df8c"
+
+storage_account_rg = "rg-loki-dev"
+
+storage_account_name = "lokidevf0g85ubh"
+

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: storage-access-test
+  namespace: monitoring-dev
+  labels:
+    azure.workload.identity/use: "true"  # Required for Azure Workload Identity
+spec:
+  serviceAccountName: monitoring-sa
+  automountServiceAccountToken: true
+  containers:
+  - name: test-container
+    image: mcr.microsoft.com/azure-cli:latest
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    command: ["/bin/bash"]
+    args: ["-c", "echo 'Pod ready for manual testing with Azure CLI. Use kubectl exec to access.' && while true; do sleep 300; done"]
+  restartPolicy: Never

@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: storage-access-test
+  namespace: monitoring-dev
+spec:
+  template:
+    spec:
+      serviceAccountName: monitoring-sa
+      containers:
+      - name: test-container
+        image: mcr.microsoft.com/azure-cli:latest
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          echo "Testing Azure Storage access..."
+          
+          # Login with managed identity using the specific client ID
+          echo "Logging in with client ID: ffd13b39-240d-4c8c-b941-ee89a8c1c1fb"
+          az login --identity --username ffd13b39-240d-4c8c-b941-ee89a8c1c1fb
+          
+          # Test storage account access
+          echo "Attempting to list blobs in loki-chunk container..."
+          az storage blob list \
+            --account-name storefortest1234 \
+            --container-name loki-chunk \
+            --auth-mode login \
+            --output table
+          
+          # Test write permissions (optional)
+          echo "Testing write access..."
+          echo "test-content-$(date)" | az storage blob upload \
+            --account-name storefortest1234 \
+            --container-name loki-chunk \
+            --name "test-file-$(date +%s).txt" \
+            --data @- \
+            --auth-mode login \
+            --overwrite
+            
+          echo "Storage access test completed"
+      restartPolicy: Never
+  backoffLimit: 1
